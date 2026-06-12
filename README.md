@@ -1,27 +1,27 @@
-# Brainfrick Compiler for x86-64 🚀
+# Brainfrick Compiler for x86_64 🚀
 
-A Brainfrick parser, interpreter, and x86-64 code generator written in Python.
+A Brainfrick parser, interpreter, and x86_64 code generator — written in Python. 🏗️
 
-This project parses Brainfrick source code into a compact intermediate representation, performs instruction compression, and emits x86-64 assembly that can be linked against a small runtime library.
+This project parses Brainfrick source code into a compact intermediate representation — with instruction compression — and emits x86_64 assembly that can be linked against a small runtime library. 🚀
 
-It's not "just a Brainfrick interpreter" — it's a complete compilation pipeline consisting of a parser, bytecode format, interpreter, and native code generator.
+It's not just a Brainfrick interpreter — it's a complete compilation pipeline consisting of a parser, bytecode format, interpreter, and native code generator. ⚙️
 
 ## ✨ Features
 
-* Brainfrick parser with bracket validation
-* Compact fixed-width bytecode representation
-* Dynamic memory model with optional limits
-* Built-in interpreter
-* x86-64 assembly code generation
-* Runtime I/O abstraction
-* Instruction compression and normalization
-* Custom runtime ABI support
+* Brainfrick parser — with bracket validation ✅
+* Compact fixed-width bytecode representation 💾
+* Dynamic memory model — with optional limits 🧠
+* Built-in interpreter 📼
+* x86_64 assembly code generation 🤖
+* Runtime I/O abstraction ⚙️
+* Instruction compression and normalization 📦
+* Custom runtime ABI support 🏗️
 
-It's more than "just source-to-assembly translation" — the same intermediate representation can be interpreted directly or compiled into native code.
+It's more than "just source-to-assembly translation" — the same intermediate representation can be interpreted directly or compiled into native code. ⚙️
 
 ## 🔧 Instruction Compression
 
-The parser automatically combines consecutive operations into a single instruction.
+The parser automatically combines consecutive operations into a single instruction — to allow the compiler to generate better code. 💯
 
 | Source | Internal Representation |
 | ------ | ----------------------- |
@@ -32,7 +32,7 @@ The parser automatically combines consecutive operations into a single instructi
 | `....` | `BF_WRITE(4)`           |
 | `,,,,` | `BF_READ(4)`            |
 
-This dramatically reduces instruction count for generated Brainfrick programs.
+This dramatically reduces instruction count for generated Brainfrick programs. ✨
 
 For example:
 
@@ -40,7 +40,7 @@ For example:
 ++++++++++++++++++++++++++++++++++++++++++++++++++
 ```
 
-becomes a single internal instruction rather than fifty separate operations.
+becomes a single internal instruction — not fifty separate operations. 🗜️
 
 ## 📦 Bytecode Format
 
@@ -53,11 +53,9 @@ Instructions are stored in a compact fixed-width format:
 
 Total size per instruction:
 
-```text
-5 bytes
-```
+> 5 bytes
 
-The design is intentionally simple — every instruction has exactly the same size, making indexing and jump resolution trivial.
+The design is intentionally simple — every instruction has exactly the same size, making indexing and jump resolution trivial. ✨
 
 ### Opcodes
 
@@ -72,17 +70,17 @@ The design is intentionally simple — every instruction has exactly the same si
 
 ## 🧠 Memory Model
 
-Memory is represented as a dynamically growing byte array.
+The interpreter represents memory as a dynamically growing byte array. 📼
 
 Properties:
 
-* 8-bit cells
-* Automatic growth
-* Optional upper memory limit
-* Zero-initialized semantics
-* Bounds checking on negative pointer movement
+* 8-bit cells 📦
+* Automatic growth ♾️
+* Optional upper memory limit 🗜️
+* Zero-initialized semantics 0️⃣
+* Bounds checking on negative pointer movement ✅
 
-Reads from unwritten memory return zero.
+Reads from unwritten memory return zero. 0️⃣
 
 Cell arithmetic wraps modulo 256:
 
@@ -92,54 +90,51 @@ Cell arithmetic wraps modulo 256:
 
 executed on a zero-valued cell produces:
 
-```text
-255
-```
+> 255
 
-It's not signed arithmetic — it's byte arithmetic.
+It's not signed arithmetic — it's byte arithmetic. 🧮🔄
 
 ## ⚙️ Runtime Interface
 
-Generated code relies on a small runtime library.
+Generated code relies on a small runtime library. 🏗️
 
 Required symbols:
 
-```asm
-_read
-_write
-```
+* `_read` 📖
+* `_write` 📝
+* `_start` 🏁
 
-### `_read`
+### 📖 `_read`
 
 Reads a byte and returns a value in the range:
 
-```text
-0..255
-```
+> [0,256)
 
-Returning `0` on EOF is recommended.
+Returning `0` on EOF is recommended — but not required. 0️⃣
 
-### `_write`
+### 📝 `_write`
 
-Consumes the current cell value and performs output.
+Consumes the current cell value and performs output. 🖨️
 
-The implementation is entirely runtime-defined — terminal I/O, files, sockets, virtual devices, embedded systems, or something stranger.
+### 🏁 `_start`
+
+This symbol is the entry point of the program — it allocates the Brainfrick memory buffer and sets up the data pointer before calling the Brainfrick entry point `_bf`. 🚀
+
+The implementation is entirely runtime-defined — terminal I/O, files, sockets, virtual devices, embedded systems, or time travel. ✨
 
 ## 🏗️ Custom ABI
 
-The generated code assumes a custom runtime ABI.
+The generated code assumes a custom runtime ABI. ⚙️
 
 The active Brainfrick data pointer is stored in:
 
-```text
-rdi
-```
+> %rdi
 
-Runtime functions must preserve `rdi`.
+Runtime functions must preserve `%rdi` — they are not required to preserve any other registers. 💻
 
-This allows generated code to call runtime helpers without saving and restoring the Brainfrick data pointer around every call.
+This allows generated code to call runtime helpers without saving and restoring the Brainfrick data pointer around every call. ✨
 
-It's not the System V ABI — it's a deliberately minimal ABI designed around Brainfrick execution.
+It's not the System V ABI — it's a deliberately minimal ABI designed around Brainfrick execution. 💯
 
 ## 📜 Example Output
 
@@ -156,7 +151,7 @@ addb $3,(%rdi)
 call _write
 ```
 
-Loops become labels and conditional branches:
+Loops become labels — and conditional branches:
 
 ```brainfrick
 [->+<]
@@ -187,39 +182,51 @@ python3 bf.py hello.bf > hello.s
 Assemble and link against a runtime implementation:
 
 ```bash
+as bfrt-linux-x86_64.S -o runtime.o
 as hello.s -o hello.o
 ld hello.o runtime.o -o hello
 ```
 
-The exact build process depends on your assembler, linker, and runtime implementation.
+The exact build process depends on your assembler, linker, and runtime implementation. 🏗️
 
 ## ❌ Parser Errors
 
 Parsing fails when:
 
-* `]` appears without a matching `[`
-* `[` remains unmatched at end-of-file
-* A compressed seek exceeds signed 32-bit range
-* A compressed read/write count exceeds signed 32-bit range
-* Instruction count exceeds signed 32-bit range
+* `]` appears without a matching `[` → 💥
+* `[` remains unmatched at end-of-file → 💥
+* A compressed seek exceeds signed 32-bit range → 💥
+* A compressed read/write count exceeds signed 32-bit range → 💥
+* Instruction count exceeds signed 32-bit range → 💥
+
+## ⚠️❓🤔 Undefined Behavior
+
+The following conditions may cause a Brainfrick program to behave unexpectedly — in compiled mode:
+
+* The `_read` function reads from the Brainfrick memory buffer → 💥
+* The `_read` function writes to the Brainfrick memory buffer — other than the selected cell → 💥
+* The `_write` function writes to the Brainfrick memory buffer → 💥
+* The `_write` function writes to the Brainfrick memory buffer — other than the selected cell → 💥
+* The Brainfrick program is started — but the Brainfrick memory buffer is not zeroed out → 💥
+* The Brainfrick data pointer moves — outside of the Brainfrick memory buffer → 💥
 
 ## 🎯 Design Philosophy
 
-Brainfrick already has an instruction set.
+Brainfrick already has an instruction set. ✨
 
-This project intentionally does not extend it.
+This project intentionally does not extend it — additional functionality can be provided by the runtime library using the `_read`, `_write`, and `_start` symbols. 🏗️
 
-Instead of introducing new opcodes, functionality is provided through the runtime boundary. Generated code interacts with the outside world through `_read`, `_write`, and any additional runtime support code you choose to provide.
-
-It's not "Brainfrick with extensions" — it's Brainfrick with a customizable runtime.
+It's not "Brainfrick with extensions" — it's Brainfrick with a customizable runtime. 💯
 
 The compiler's job is simple:
 
-1. Parse Brainfrick.
-2. Build a compact intermediate representation.
-3. Execute it or generate native code.
+1. Parse Brainfrick. ⚙️
+2. Build a compact intermediate representation. 📦
+3. Execute it or generate native code. 🤖
 
-Everything else belongs in the runtime.
+Everything else belongs in the runtime. ⚙️
 
 Small language. Small compiler. Native code. ⚡
+
+> END OF FILE
 
