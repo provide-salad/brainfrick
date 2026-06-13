@@ -38,7 +38,15 @@ class BFInterp:
     def __init__(self: typing.Self, strm: BFOptimizer, itp_impl: BFImpl, mem_limit: int) -> None:
         insns: list[BFInsn] = []
         c: BFInsn = strm.next()
+        loops: list[int] = []
         while c.insn_type != BF_END:
+            if c.insn_type == BF_JZ:
+                loops.append(len(insns))
+            elif c.insn_type == BF_JNZ:
+                jz: int = loops.pop()
+                jnz: int = len(insns)
+                insns[jz].insn_value = jnz
+                c.insn_value = jz
             insns.append(c)
             c = strm.next()
         self.itp_bf = tuple(insns)

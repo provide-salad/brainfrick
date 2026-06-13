@@ -158,12 +158,13 @@ Optimizations can be toggled individually by changing their respective flag in `
 
 ### `cfg_dead_code_removal`
 
-This option allows the compiler to elide operations that add zero to the current cell or the data pointer. Only functional with `cfg_fold_repetition`. Default is `True`. 🚀 
+This option allows the compiler to elide operations that add zero to the current cell or the data pointer, and converts instructions that add or subtract 1 to `inc` and `dec` respectively.
+Only functional if `cfg_fold_repetition` is `True`. Default is `True`. 🗑️
 
 For example:
 
 ```brainfrick
-++--.
+++--.+>.
 ```
 
 ↓
@@ -171,6 +172,8 @@ For example:
 ```asm
 call _write
 incb (%rdi)
+incq %rdi
+call _write
 ```
 
 instead of
@@ -179,7 +182,9 @@ instead of
 addb $2,(%rdi)
 subb $2,(%rdi)
 call _write
-incb (%rdi)
+addb $1,(%rdi)
+addq $1,%rdi
+call _write
 ```
 
 ### `cfg_lazy_seek`
@@ -212,7 +217,8 @@ call _write
 
 ### `cfg_fold_repetition`
 
-This option allows the compiler to fold multiple consecutive `+`/`-`, `<`/`>`, `.`, or `,` operations into a single instruction. Default is `True`. 📦
+This option allows the compiler to fold multiple consecutive `+`/`-`, `<`/`>`, `.`, or `,` operations into a single instruction.
+If this option is disabled, always use short instruction encoding for increments and decrements. Default is `True`. 📦
 
 For example:
 

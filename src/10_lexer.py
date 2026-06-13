@@ -10,7 +10,7 @@ TOK_JNZ: int = 6
 TOK_READ: int = 7
 TOK_WRITE: int = 8
 
-LEX_TOKENS: dict[str, int] = {
+LEX_TOKENS: dict[int, int] = {
     ord("+") : TOK_ADD,
     ord("-") : TOK_SUB,
     ord("<") : TOK_SEEKB,
