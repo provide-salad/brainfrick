@@ -199,6 +199,40 @@ Parsing fails when:
 * A compressed read/write count exceeds signed 32-bit range → 💥
 * Instruction count exceeds signed 32-bit range → 💥
 
+## 🚀 Optimizations
+
+This compiler optimizes certain Brainfrick constructs to generate better code.
+
+Optimizations can be toggled individually by changing their respective flag in `01_config.py`.
+
+### `cfg_lazy_seek`
+
+This option allows the compiler to avoid emitting code that moves the data pointer when it doesn't need to. Default is `True`.
+
+For example:
+
+```brainfrick
++>>+++<<.
+```
+
+↓
+
+```asm
+incb (%rdi)
+addb $3,2(%rdi)
+call _write
+```
+
+instead of:
+
+```asm
+incb (%rdi)
+addq $2,%rdi
+addb $3,(%rdi)
+subq $2,%rdi
+call _write
+```
+
 ## ⚠️❓🤔 Undefined Behavior
 
 The following conditions may cause a Brainfrick program to behave unexpectedly — in compiled mode:

@@ -23,7 +23,14 @@ def main(args: tuple[str, ...]):
     def _write(x: int) -> None:
         sys.stdout.buffer.write(bytes((x,)))
 
-    compiler = BFCompilerX64(bf)
+    optimizer = BFOptimizer(bf)
+    optimized = optimizer.optimize()
+
+#    interp = BFInterp(optimized, impl, 0)
+#    interp.run()
+#    return 0
+
+    compiler = BFCompilerX64(optimized)
     compiled = compiler.compile()
     if compiled is None:
         print("[ERR] Failed to compile BF", file=sys.stderr)

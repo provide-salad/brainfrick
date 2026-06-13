@@ -45,7 +45,7 @@ class BFInterp:
             insn: BFCommand = self.itp_bf.at(ip)
             if insn.com_type == BF_ADD:
                 self.itp_mem.memwrite((self.itp_mem.memread() + insn.com_value) & 0xFF)
-            elif insn.com_type == BF_SEEK:
+            elif insn.com_type == BF_SEEK or insn.com_type == BF_LAZY_SEEK:
                 if self.itp_mem.memseek(insn.com_value):
                     return True
             elif insn.com_type == BF_JZ:
