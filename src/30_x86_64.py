@@ -46,6 +46,8 @@ class BFCompilerX64:
                 self.comp_asm.append("\n".join(f"call _read" for i in range(insn.insn_value)))
             elif insn.insn_type == BF_WRITE:
                 self.comp_asm.append("\n".join(f"call _write" for i in range(insn.insn_value)))
+            elif insn.insn_type == BF_SET:
+                self.comp_asm.append(f"movb ${insn.insn_value},{self.comp_mem_ptr}(%rdi)")
             elif insn.insn_type == BF_LAZY_SEEK:
                 self.comp_mem_ptr += insn.insn_value
             ip += 1

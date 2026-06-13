@@ -187,6 +187,33 @@ addq $1,%rdi
 call _write
 ```
 
+### `cfg_fold_repetition`
+
+This option allows the compiler to fold multiple consecutive `+`/`-`, `<`/`>`, `.`, or `,` operations into a single instruction.
+If this option is disabled, always use short instruction encoding for increments and decrements. Default is `True`. 📦
+
+For example:
+
+```brainfrick
++++++
+```
+
+↓
+
+```asm
+addb $5,(%rdi)
+```
+
+instead of:
+
+```asm
+incb (%rdi)
+incb (%rdi)
+incb (%rdi)
+incb (%rdi)
+incb (%rdi)
+```
+
 ### `cfg_lazy_seek`
 
 This option allows the compiler to avoid emitting code that moves the data pointer when it doesn't need to. Default is `True`. ✨
@@ -215,32 +242,41 @@ subq $2,%rdi
 call _write
 ```
 
-### `cfg_fold_repetition`
+### `cfg_partial_eval`
 
-This option allows the compiler to fold multiple consecutive `+`/`-`, `<`/`>`, `.`, or `,` operations into a single instruction.
-If this option is disabled, always use short instruction encoding for increments and decrements. Default is `True`. 📦
+This option allows the compiler to precompute constants where `cfg_fold_repetition` would not be able to, and only emit them when they are needed. It assumes the memory buffer starts zeroed out.
+Enabling this option may significantly increase compilation times, especially if `cfg_fold_repetition` is disabled. Default is `False`. 💯
 
 For example:
 
 ```brainfrick
-+++++
++++>++.<<+++.
 ```
 
 ↓
 
 ```asm
-addb $5,(%rdi)
+incq %rdi
+movb $2,(%rdi)
+call _write
+decq %rdi
+movb $6,(%rdi)
+call _write
 ```
 
-instead of:
+instead of
 
-```asm
-incb (%rdi)
-incb (%rdi)
-incb (%rdi)
-incb (%rdi)
-incb (%rdi)
 ```
+addb $3,(%rdi)
+incq %rdi
+addb $2,(%rdi)
+call _write
+decq %rdi
+addb $3,(%rdi)
+call _write
+```
+
+> Note: this may cause problems if your runtime is non-standard, see "Undefined Behavior" below. ⚠️
 
 ## ⚠️❓🤔 Undefined Behavior
 
@@ -272,5 +308,5 @@ Everything else belongs in the runtime. ⚙️
 
 Small language. Small compiler. Native code. ⚡
 
-> END OF FILE
+> provide salad was here :)
 

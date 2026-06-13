@@ -75,6 +75,8 @@ class BFInterp:
                 c: int = self.itp_mem.memread()
                 for i in range(insn.insn_value):
                     self.itp_impl.write(c)
+            elif insn.insn_type == BF_SET:
+                self.itp_mem.memwrite(insn.insn_value)
             ip += 1
         return False
 
