@@ -6,10 +6,6 @@ def main(args: tuple[str, ...]):
         return 2
     with open(args[1], "r") as f:
         source_code: str = f.read()
-    bf = bf_parse(source_code)
-    if bf is None:
-        print("[ERR] Failed to parse BF", file=sys.stderr)
-        return 1
     impl = BFImpl()
 
     @impl.readfunc
@@ -23,21 +19,21 @@ def main(args: tuple[str, ...]):
     def _write(x: int) -> None:
         sys.stdout.buffer.write(bytes((x,)))
 
-    optimizer = BFOptimizer(bf)
-    optimized = optimizer.optimize()
+    lexer = BFLexer(source_code)
+    parser = BFParser(lexer, DEFCONFIG)
+    optimizer = BFOptimizer(parser)
 
-#    interp = BFInterp(optimized, impl, 0)
+#    interp = BFInterp(optimizer, impl, 0)
 #    interp.run()
 #    return 0
 
-    compiler = BFCompilerX64(optimized)
+    compiler = BFCompilerX64(optimizer)
     compiled = compiler.compile()
     if compiled is None:
         print("[ERR] Failed to compile BF", file=sys.stderr)
         return 1
     print(".extern _read\n.extern _write\n.global _bf\n_bf:")
     print(compiled)
-    print("ret")
     return 0
 
 if __name__ == "__main__":

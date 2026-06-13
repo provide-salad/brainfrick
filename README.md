@@ -19,55 +19,6 @@ It's not just a Brainfrick interpreter — it's a complete compilation pipeline 
 
 It's more than "just source-to-assembly translation" — the same intermediate representation can be interpreted directly or compiled into native code. ⚙️
 
-## 🔧 Instruction Compression
-
-The parser automatically combines consecutive operations into a single instruction — to allow the compiler to generate better code. 💯
-
-| Source | Internal Representation |
-| ------ | ----------------------- |
-| `++++` | `BF_ADD(4)`             |
-| `----` | `BF_ADD(252)`           |
-| `>>>>` | `BF_SEEK(4)`            |
-| `<<<<` | `BF_SEEK(-4)`           |
-| `....` | `BF_WRITE(4)`           |
-| `,,,,` | `BF_READ(4)`            |
-
-This dramatically reduces instruction count for generated Brainfrick programs. ✨
-
-For example:
-
-```brainfrick
-++++++++++++++++++++++++++++++++++++++++++++++++++
-```
-
-becomes a single internal instruction — not fifty separate operations. 🗜️
-
-## 📦 Bytecode Format
-
-Instructions are stored in a compact fixed-width format:
-
-| Offset | Size    | Description           |
-| ------ | ------- | --------------------- |
-| 0      | 1 byte  | Opcode                |
-| 1      | 4 bytes | Signed 32-bit operand |
-
-Total size per instruction:
-
-> 5 bytes
-
-The design is intentionally simple — every instruction has exactly the same size, making indexing and jump resolution trivial. ✨
-
-### Opcodes
-
-| Opcode     | Value |
-| ---------- | ----- |
-| `BF_ADD`   | 1     |
-| `BF_SEEK`  | 2     |
-| `BF_JZ`    | 3     |
-| `BF_JNZ`   | 4     |
-| `BF_READ`  | 5     |
-| `BF_WRITE` | 6     |
-
 ## 🧠 Memory Model
 
 The interpreter represents memory as a dynamically growing byte array. 📼
@@ -100,11 +51,11 @@ Generated code relies on a small runtime library. 🏗️
 
 Required symbols:
 
-* `_read` 📖
-* `_write` 📝
-* `_start` 🏁
+* `_read`
+* `_write`
+* `_start`
 
-### 📖 `_read`
+### `_read`
 
 Reads a byte and returns a value in the range:
 
@@ -112,11 +63,11 @@ Reads a byte and returns a value in the range:
 
 Returning `0` on EOF is recommended — but not required. 0️⃣
 
-### 📝 `_write`
+### `_write`
 
 Consumes the current cell value and performs output. 🖨️
 
-### 🏁 `_start`
+### `_start`
 
 This symbol is the entry point of the program — it allocates the Brainfrick memory buffer and sets up the data pointer before calling the Brainfrick entry point `_bf`. 🚀
 
@@ -201,13 +152,39 @@ Parsing fails when:
 
 ## 🚀 Optimizations
 
-This compiler optimizes certain Brainfrick constructs to generate better code.
+This compiler optimizes certain Brainfrick constructs to generate better code. 💯
 
-Optimizations can be toggled individually by changing their respective flag in `01_config.py`.
+Optimizations can be toggled individually by changing their respective flag in `01_config.py`. 📝
+
+### `cfg_dead_code_removal`
+
+This option allows the compiler to elide operations that add zero to the current cell or the data pointer. Only functional with `cfg_fold_repetition`. Default is `True`. 🚀 
+
+For example:
+
+```brainfrick
+++--.
+```
+
+↓
+
+```asm
+call _write
+incb (%rdi)
+```
+
+instead of
+
+```asm
+addb $2,(%rdi)
+subb $2,(%rdi)
+call _write
+incb (%rdi)
+```
 
 ### `cfg_lazy_seek`
 
-This option allows the compiler to avoid emitting code that moves the data pointer when it doesn't need to. Default is `True`.
+This option allows the compiler to avoid emitting code that moves the data pointer when it doesn't need to. Default is `True`. ✨
 
 For example:
 
@@ -231,6 +208,32 @@ addq $2,%rdi
 addb $3,(%rdi)
 subq $2,%rdi
 call _write
+```
+
+### `cfg_fold_repetition`
+
+This option allows the compiler to fold multiple consecutive `+`/`-`, `<`/`>`, `.`, or `,` operations into a single instruction. Default is `True`. 📦
+
+For example:
+
+```brainfrick
++++++
+```
+
+↓
+
+```asm
+addb $5,(%rdi)
+```
+
+instead of:
+
+```asm
+incb (%rdi)
+incb (%rdi)
+incb (%rdi)
+incb (%rdi)
+incb (%rdi)
 ```
 
 ## ⚠️❓🤔 Undefined Behavior
