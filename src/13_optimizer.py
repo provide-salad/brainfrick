@@ -22,7 +22,7 @@ class BFOptimizer:
         self.opt_lazy_seek_offset += offset
         return BFInsn(BF_LAZY_SEEK, offset)
     def commit_seek(self: typing.Self) -> None:
-        if self.opt_lazy_seek_offset == 0 and self.opt_parser.bfp_config.cfg_dead_code_removal():
+        if self.opt_lazy_seek_offset == 0 and self.opt_parser.bfp_config.cfg_remove_dead_code():
             return
         if self.opt_lazy_seek_reference == -1:
             self.opt_queue.append(BFInsn(BF_SEEK, 0))

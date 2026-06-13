@@ -28,7 +28,7 @@ class BFParser:
                     c = lexer.next()
                 self.bfp_cur_tok = c
                 change &= 0xFF
-                if change == 0 and config.cfg_dead_code_removal():
+                if change == 0 and config.cfg_remove_dead_code():
                     continue
                 return BFInsn(BF_ADD, change)
             if c.tok_type == TOK_SEEKB or c.tok_type == TOK_SEEKF:
@@ -41,7 +41,7 @@ class BFParser:
                     dp_change += ((c.tok_type - TOK_SEEKB) << 1) - 1
                     c = lexer.next()
                 self.bfp_cur_tok = c
-                if dp_change == 0 and config.cfg_dead_code_removal():
+                if dp_change == 0 and config.cfg_remove_dead_code():
                     continue
                 return BFInsn(BF_SEEK, dp_change)
             if c.tok_type == TOK_JZ:

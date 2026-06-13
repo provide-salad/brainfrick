@@ -16,7 +16,7 @@ class BFCompilerX64:
         insn: BFInsn = strm.next()
         while insn.insn_type != BF_END:
             if insn.insn_type == BF_ADD:
-                if config.cfg_dead_code_removal() or not config.cfg_fold_repetition():
+                if config.cfg_remove_dead_code() or not config.cfg_fold_repetition():
                     if insn.insn_value == 0x01:
                         self.comp_asm.append(f"incb {self.comp_mem_ptr}(%rdi)")
                     elif insn.insn_value == 0xFF:
@@ -27,7 +27,7 @@ class BFCompilerX64:
                     self.comp_asm.append(f"addb ${insn.insn_value},{self.comp_mem_ptr}(%rdi)")
             elif insn.insn_type == BF_SEEK:
                 offset: int = self.comp_mem_ptr + insn.insn_value
-                if config.cfg_dead_code_removal() or not config.cfg_fold_repetition():
+                if config.cfg_remove_dead_code() or not config.cfg_fold_repetition():
                     if offset == 0:
                         pass
                     elif offset == 1:

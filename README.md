@@ -156,7 +156,7 @@ This compiler optimizes certain Brainfrick constructs to generate better code. �
 
 Optimizations can be toggled individually by changing their respective flag in `01_config.py`. 📝
 
-### `cfg_dead_code_removal`
+### `cfg_remove_dead_code`
 
 This option allows the compiler to elide operations that add zero to the current cell or the data pointer, and converts instructions that add or subtract 1 to `inc` and `dec` respectively.
 Only functional if `cfg_fold_repetition` is `True`. Default is `True`. 🗑️
@@ -252,6 +252,7 @@ The following conditions may cause a Brainfrick program to behave unexpectedly �
 * The `_write` function writes to the Brainfrick memory buffer — other than the selected cell → 💥
 * The Brainfrick program is started — but the Brainfrick memory buffer is not zeroed out → 💥
 * The Brainfrick data pointer moves — outside of the Brainfrick memory buffer → 💥
+* The start of the Brainfrick memory buffer is not 16-byte aligned → 💥
 
 ## 🎯 Design Philosophy
 
