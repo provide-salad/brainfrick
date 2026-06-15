@@ -27,7 +27,7 @@ class BFOptimizerMemory:
             return True
         return False
     def read(self: typing.Self) -> int:
-        idx: int = self.optm_pos if self.optm_pos >= 0 else -self.optm_pos
+        idx: int = self.optm_pos if self.optm_pos >= 0 else ~self.optm_pos
         buf: bytearray = self.optm_az if self.optm_pos >= 0 else self.optm_bz
         if idx >= len(buf) >> 1:
             return 0 if self.optm_flags & OPTM_ZERO else -1
@@ -35,7 +35,7 @@ class BFOptimizerMemory:
         state: int = buf[(idx << 1) | 1]
         return -1 if state == OPTM_UNKNOWN else value
     def write(self: typing.Self, value: int) -> None:
-        idx: int = self.optm_pos if self.optm_pos >= 0 else -self.optm_pos
+        idx: int = self.optm_pos if self.optm_pos >= 0 else ~self.optm_pos
         buf: bytearray = self.optm_az if self.optm_pos >= 0 else self.optm_bz
         config: BFConfig = self.optm_optimizer.opt_parser.bfp_config
         if idx >= len(buf) >> 1:
@@ -52,7 +52,7 @@ class BFOptimizerMemory:
         buf[idx << 1] = value
         buf[(idx << 1) | 1] = OPTM_KNOWN
     def add(self: typing.Self, value: int) -> None:
-        idx: int = self.optm_pos if self.optm_pos >= 0 else -self.optm_pos
+        idx: int = self.optm_pos if self.optm_pos >= 0 else ~self.optm_pos
         buf: bytearray = self.optm_az if self.optm_pos >= 0 else self.optm_bz
         if idx >= len(buf) >> 1:
             for i in range(0, idx - (len(buf) >> 1)):
@@ -65,7 +65,7 @@ class BFOptimizerMemory:
         if buf[(idx << 1) | 1] == OPTM_COMMITTED:
             buf[(idx << 1) | 1] = OPTM_KNOWN
     def invalidate(self: typing.Self) -> None:
-        idx: int = self.optm_pos if self.optm_pos >= 0 else -self.optm_pos
+        idx: int = self.optm_pos if self.optm_pos >= 0 else ~self.optm_pos
         buf: bytearray = self.optm_az if self.optm_pos >= 0 else self.optm_bz
         if idx >= len(buf) >> 1:
             for i in range(0, idx - (len(buf) >> 1)):
@@ -105,7 +105,7 @@ class BFOptimizerMemory:
         use_zero: bool = (self.optm_flags & OPTM_ZERO) != 0
         optimizer: BFOptimizer = self.optm_optimizer
         restore_idx: int = self.optm_pos
-        for i in range((-len(self.optm_bz) or -1) + 1, len(self.optm_az)):
+        for i in range(-len(self.optm_bz), len(self.optm_az)):
             if self.commit_at(i):
                 use_zero = False
         optimizer.abs_seek(restore_idx)

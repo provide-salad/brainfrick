@@ -80,6 +80,7 @@ class BFOptimizer:
                     self.commit_seek()
                 if config.cfg_partial_eval() and len(self.opt_loops) == 0:
                     self.opt_mem.reset()
+                    self.opt_mem.write(0)
                 return self.pop_loop()
             if insn.insn_type == BF_READ:
                 if config.cfg_partial_eval() and len(self.opt_loops) == 0:
