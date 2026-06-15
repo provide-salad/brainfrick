@@ -25,6 +25,7 @@ class BFToken:
     __slots__ = ("tok_type", "tok_offset")
     tok_type: int
     tok_offset: int
+
     def __init__(self: typing.Self, tok_type: int, tok_offset: int) -> None:
         self.tok_type = tok_type
         self.tok_offset = tok_offset
@@ -33,9 +34,11 @@ class BFLexer:
     __slots__ = ("lex_source", "lex_offset")
     lex_source: bytes
     lex_offset: int
+
     def __init__(self: typing.Self, source: str) -> None:
         self.lex_source = bytes(source, "utf8")
         self.lex_offset = 0
+
     def next(self: typing.Self) -> BFToken:
         count: int = len(self.lex_source)
         i: int

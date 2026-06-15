@@ -37,7 +37,7 @@ class BFOptimizerMemory:
     def write(self: typing.Self, value: int) -> None:
         idx: int = self.optm_pos if self.optm_pos >= 0 else ~self.optm_pos
         buf: bytearray = self.optm_az if self.optm_pos >= 0 else self.optm_bz
-        config: BFConfig = self.optm_optimizer.opt_parser.bfp_config
+        config: BFConfig = self.optm_optimizer.opt_strm.config()
         if idx >= len(buf) >> 1:
             for i in range(0, idx - (len(buf) >> 1)):
                 buf.append(0)
@@ -84,7 +84,7 @@ class BFOptimizerMemory:
         value: int = buf[idx << 1]
         state: int = buf[(idx << 1) | 1]
         optimizer: BFOptimizer = self.optm_optimizer
-        config: BFConfig = optimizer.opt_parser.bfp_config
+        config: BFConfig = optimizer.opt_strm.config()
         if state == OPTM_COMMITTED:
             return value == 0
         if state == OPTM_UNKNOWN:

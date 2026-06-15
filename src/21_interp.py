@@ -35,7 +35,7 @@ class BFInterp:
     itp_bf: tuple[BFInsn, ...]
     itp_mem: BFMemory
     itp_impl: BFImpl
-    def __init__(self: typing.Self, strm: BFOptimizer, itp_impl: BFImpl, mem_limit: int) -> None:
+    def __init__(self: typing.Self, strm: BFInsnStream, itp_impl: BFImpl, mem_limit: int) -> None:
         insns: list[BFInsn] = []
         c: BFInsn = strm.next()
         loops: list[int] = []
