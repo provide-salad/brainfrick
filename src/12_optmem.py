@@ -46,7 +46,7 @@ class BFOptimizerMemory:
             return
         old_value: int = buf[idx << 1]
         old_state: int = buf[(idx << 1) | 1]
-        if value == old_value and old_state != OPTM_UNKNOWN:
+        if value == old_value and old_state != OPTM_UNKNOWN and config.cfg_remove_dead_code():
             return
         buf[idx << 1] = value
         buf[(idx << 1) | 1] = OPTM_KNOWN
@@ -83,20 +83,30 @@ class BFOptimizerMemory:
         value: int = buf[idx << 1]
         state: int = buf[(idx << 1) | 1]
         optimizer: BFOptimizer = self.optm_optimizer
-        if state == OPTM_KNOWN:
-            optimizer.opt_queue.append(BFInsn(BF_SET, value))
-            buf[(idx << 1) | 1] = OPTM_COMMITTED
-        elif state == OPTM_UNKNOWN and value != 0:
+        config: BFConfig = optimizer.opt_parser.bfp_config
+        if state == OPTM_COMMITTED:
+            return value == 0
+        if state == OPTM_UNKNOWN:
+            if value == 0 and config.cfg_remove_dead_code():
+                return
+            optimizer.abs_seek(i)
             optimizer.opt_queue.append(BFInsn(BF_ADD, value))
             buf[idx << 1] = 0
+        else:
+            optimizer.abs_seek(i)
+            optimizer.opt_queue.append(BFInsn(BF_SET, value))
+            buf[(idx << 1) | 1] = OPTM_COMMITTED
         return state == OPTM_UNKNOWN or value != 0
     def commit(self: typing.Self) -> None:
         self.commit_at(self.optm_pos)
     def reset(self: typing.Self) -> None:
         use_zero: bool = (self.optm_flags & OPTM_ZERO) != 0
+        optimizer: BFOptimizer = self.optm_optimizer
+        restore_idx: int = self.optm_pos
         for i in range((-len(self.optm_bz) or -1) + 1, len(self.optm_az)):
             if self.commit_at(i):
                 use_zero = False
+        optimizer.abs_seek(restore_idx)
         self.optm_pos = 0
         self.optm_az = bytearray()
         self.optm_bz = bytearray()

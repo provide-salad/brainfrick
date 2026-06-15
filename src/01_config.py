@@ -42,6 +42,13 @@ DEFCONFIGS: dict[str, BFConfig] = {
     ),
 }
 
+TEST_CONFIG = BFConfig(
+    cfg_remove_dead_code=False,
+    cfg_lazy_seek=False,
+    cfg_fold_repetition=False,
+    cfg_partial_eval=True,
+)
+
 def debug(*args: tuple) -> None:
     print(*args, file=sys.stderr)
 

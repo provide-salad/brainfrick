@@ -10,6 +10,18 @@ BF_WRITE = 6
 BF_SET = 7
 BF_LAZY_SEEK = 8
 
+BF_TYPES: tuple[str, ...] = (
+    "BF_END",
+    "BF_ADD",
+    "BF_SEEK",
+    "BF_JZ",
+    "BF_JNZ",
+    "BF_READ",
+    "BF_WRITE",
+    "BF_SET",
+    "BF_LAZY_SEEK",
+)
+
 class BFInsn:
     __slots__ = ("insn_type", "insn_value")
     insn_type: int
@@ -17,6 +29,8 @@ class BFInsn:
     def __init__(self: typing.Self, insn_type: int, insn_value: int) -> None:
         self.insn_type = insn_type
         self.insn_value = insn_value
+    def __repr__(self: typing.Self) -> str:
+        return f"{BF_TYPES[self.insn_type]}({self.insn_value})"
 
 class BFParser:
     __slots__ = ("bfp_lexer", "bfp_config", "bfp_cur_tok", "bfp_loop_depth")

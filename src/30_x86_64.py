@@ -16,7 +16,7 @@ class BFCompilerX64:
         insn: BFInsn = strm.next()
         while insn.insn_type != BF_END:
             if insn.insn_type == BF_ADD:
-                if config.cfg_remove_dead_code() or not config.cfg_fold_repetition():
+                if config.cfg_remove_dead_code() or (not config.cfg_partial_eval() and not config.cfg_fold_repetition()):
                     if insn.insn_value == 0x01:
                         self.comp_asm.append(f"incb {self.comp_mem_ptr}(%rdi)")
                     elif insn.insn_value == 0xFF:
@@ -27,7 +27,8 @@ class BFCompilerX64:
                     self.comp_asm.append(f"addb ${insn.insn_value},{self.comp_mem_ptr}(%rdi)")
             elif insn.insn_type == BF_SEEK:
                 offset: int = self.comp_mem_ptr + insn.insn_value
-                if config.cfg_remove_dead_code() or not config.cfg_fold_repetition():
+                self.comp_mem_ptr = 0
+                if config.cfg_remove_dead_code() or (not config.cfg_lazy_seek() and not config.cfg_fold_repetition()):
                     if offset == 0:
                         pass
                     elif offset == 1:
@@ -35,13 +36,13 @@ class BFCompilerX64:
                     elif offset == -1:
                         self.comp_asm.append(f"decq %rdi")
                     else:
-                        self.comp_asm.append(f"addq ${insn.insn_value},%rdi")
+                        self.comp_asm.append(f"addq ${offset},%rdi")
                 else:
-                    self.comp_asm.append(f"addq ${insn.insn_value},%rdi")
+                    self.comp_asm.append(f"addq ${offset},%rdi")
             elif insn.insn_type == BF_JZ:
-                self.comp_asm.append(f".LZ{insn.insn_value}:\ncmpb $0,{self.comp_mem_ptr}(%rdi)\nje .LY{insn.insn_value}")
+                self.comp_asm.append(f"cmpb $0,{self.comp_mem_ptr}(%rdi)\nje .LY{insn.insn_value}\n.LZ{insn.insn_value}:")
             elif insn.insn_type == BF_JNZ:
-                self.comp_asm.append(f".LY{insn.insn_value}:\ncmpb $0,{self.comp_mem_ptr}(%rdi)\njne .LZ{insn.insn_value}")
+                self.comp_asm.append(f"cmpb $0,{self.comp_mem_ptr}(%rdi)\njne .LZ{insn.insn_value}\n.LY{insn.insn_value}:")
             elif insn.insn_type == BF_READ:
                 self.comp_asm.append("\n".join(f"call _read" for i in range(insn.insn_value)))
             elif insn.insn_type == BF_WRITE:

@@ -245,7 +245,7 @@ call _write
 ### `cfg_partial_eval`
 
 This option allows the compiler to precompute constants where `cfg_fold_repetition` would not be able to, and only emit them when they are needed. It assumes the memory buffer starts zeroed out.
-Enabling this option may significantly increase compilation times, especially if `cfg_fold_repetition` is disabled. Default is `False`. 💯
+Enabling this option may significantly increase compilation times or code size, especially if `cfg_fold_repetition` or `cfg_remove_dead_code` are disabled. Default is `False`. 💯
 
 For example:
 
