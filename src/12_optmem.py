@@ -37,6 +37,7 @@ class BFOptimizerMemory:
     def write(self: typing.Self, value: int) -> None:
         idx: int = self.optm_pos if self.optm_pos >= 0 else -self.optm_pos
         buf: bytearray = self.optm_az if self.optm_pos >= 0 else self.optm_bz
+        config: BFConfig = self.optm_optimizer.opt_parser.bfp_config
         if idx >= len(buf) >> 1:
             for i in range(0, idx - (len(buf) >> 1)):
                 buf.append(0)
@@ -88,15 +89,16 @@ class BFOptimizerMemory:
             return value == 0
         if state == OPTM_UNKNOWN:
             if value == 0 and config.cfg_remove_dead_code():
-                return
+                return True
             optimizer.abs_seek(i)
             optimizer.opt_queue.append(BFInsn(BF_ADD, value))
             buf[idx << 1] = 0
+            return True
         else:
             optimizer.abs_seek(i)
             optimizer.opt_queue.append(BFInsn(BF_SET, value))
             buf[(idx << 1) | 1] = OPTM_COMMITTED
-        return state == OPTM_UNKNOWN or value != 0
+            return value != 0
     def commit(self: typing.Self) -> None:
         self.commit_at(self.optm_pos)
     def reset(self: typing.Self) -> None:

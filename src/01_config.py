@@ -13,6 +13,11 @@ class BFConfig:
         cfg_lazy_seek: bool = True,
         cfg_partial_eval: bool = False,
     ) -> None:
+        # Each line in the form flags | FLAG & -flag
+        # because it turns the boolean into a bitmask.
+        # -True becomes -1 and -False becomes 0.
+        # Since X & 0 is 0 and X & -1 is X, it allows
+        # to add flags if the boolean is True.
         flags: int = 0
         flags |= CFG_REMOVE_DEAD_CODE & -cfg_remove_dead_code
         flags |= CFG_FOLD_REPETITION & -cfg_fold_repetition
