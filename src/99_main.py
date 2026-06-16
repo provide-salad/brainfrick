@@ -20,7 +20,7 @@ def main(args: tuple[str, ...]):
         sys.stdout.buffer.write(bytes((x,)))
 
     lexer = BFLexer(source_code)
-    parser = BFParser(lexer, DEFCONFIGS["all"])
+    parser = BFParser(lexer, DEFCONFIGS["default"])
     optimizer = BFOptimizer(parser)
 
 #    interp = BFInterp(optimizer, impl, 0)

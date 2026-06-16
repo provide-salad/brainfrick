@@ -31,7 +31,6 @@ class BFOptimizer(BFInsnStream):
     def lazy_seek(self: typing.Self, offset: int) -> BFInsn:
         self.opt_lazy_seek_reference = len(self.opt_queue)
         self.opt_lazy_seek_offset += offset
-        debug("SEEK", self.opt_lazy_seek_offset)
         return BFInsn(BF_LAZY_SEEK, offset)
 
     def abs_seek(self: typing.Self, offset: int) -> None:
@@ -44,7 +43,6 @@ class BFOptimizer(BFInsnStream):
         self.opt_queue.append(self.lazy_seek(rel_offset) if config.cfg_lazy_seek() else BFInsn(BF_SEEK, rel_offset))
 
     def commit_seek(self: typing.Self) -> None:
-        debug("COMMIT", self.opt_lazy_seek_offset)
         if self.opt_lazy_seek_offset == 0 and self.opt_strm.config().cfg_remove_dead_code():
             self.opt_lazy_seek_reference = -1
             return
@@ -76,7 +74,6 @@ class BFOptimizer(BFInsnStream):
         optmem_base: int
         while True:
             insn: BFInsn = strm.next()
-            debug("IN", insn)
             if insn.insn_type == BF_END:
                 return insn
             if insn.insn_type == BF_ADD:
@@ -92,6 +89,8 @@ class BFOptimizer(BFInsnStream):
                 return insn
             if insn.insn_type == BF_JZ:
                 loop = BFLoopAnalyzer(self.opt_mem, self.opt_strm).run()
+                if config.cfg_partial_eval() and config.cfg_remove_dead_code() and self.opt_mem.read() == 0:
+                    continue
                 self.opt_strm.push(loop.loop_insns)
                 self.opt_loop_summaries.append(loop)
                 if loop.loop_offset == 0:

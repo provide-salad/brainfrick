@@ -34,8 +34,6 @@ class BFLoopAnalyzer:
         insn: BFInsn
         while True:
             insn = strm.next()
-            if insn.insn_type != BF_END:
-                debug("LOOP", insn)
             out.append(insn)
             if insn.insn_type == BF_JNZ:
                 return BFLoopSummary(LOOP_PURE & -pure, offset, clobbers, out)
@@ -61,8 +59,6 @@ class BFLoopAnalyzer:
         while True:
             insn = strm.next()
             out.append(insn)
-            if insn.insn_type != BF_END:
-                debug("LOOP2", insn)
             if insn.insn_type == BF_JZ:
                 depth += 1
             elif insn.insn_type == BF_JNZ:
