@@ -59,6 +59,6 @@ TEST_CONFIG = BFConfig(
     cfg_partial_eval=True,
 )
 
-def debug(*args: tuple) -> None:
+def debug(*args: typing.Any) -> None:
     print(*args, file=sys.stderr)
 

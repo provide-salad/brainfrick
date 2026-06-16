@@ -5,10 +5,12 @@ class BFCompilerX64:
     comp_strm: BFInsnStream
     comp_asm: list[str]
     comp_mem_ptr: int
+
     def __init__(self: typing.Self, comp_strm: BFInsnStream) -> None:
         self.comp_strm = comp_strm
         self.comp_asm = []
         self.comp_mem_ptr = 0
+    
     def compile(self: typing.Self) -> str | None:
         strm: BFInsnStream = self.comp_strm
         config: BFConfig = strm.config()

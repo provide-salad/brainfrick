@@ -5,10 +5,12 @@ class BFMemory:
     mem_data: bytearray
     mem_pos: int
     mem_limit: int
+
     def __init__(self: typing.Self, mem_limit: int) -> None:
         self.mem_data = bytearray()
         self.mem_limit = mem_limit
         self.mem_pos = 0
+    
     def memseek(self: typing.Self, i: int) -> bool:
         self.mem_pos += i
         if self.mem_pos < 0:
@@ -16,10 +18,12 @@ class BFMemory:
         if self.mem_limit and self.mem_pos >= self.mem_limit:
             return True
         return False
+    
     def memread(self: typing.Self) -> int:
         if self.mem_pos >= len(self.mem_data):
             return 0
         return self.mem_data[self.mem_pos]
+    
     def memwrite(self: typing.Self, value: int) -> None:
         if self.mem_pos == len(self.mem_data):
             self.mem_data.append(value)
@@ -35,6 +39,7 @@ class BFInterp:
     itp_bf: tuple[BFInsn, ...]
     itp_mem: BFMemory
     itp_impl: BFImpl
+    
     def __init__(self: typing.Self, strm: BFInsnStream, itp_impl: BFImpl, mem_limit: int) -> None:
         insns: list[BFInsn] = []
         c: BFInsn = strm.next()
@@ -52,6 +57,7 @@ class BFInterp:
         self.itp_bf = tuple(insns)
         self.itp_mem = BFMemory(mem_limit)
         self.itp_impl = itp_impl
+    
     def run(self: typing.Self) -> bool:
         ip: int = 0
         while ip < len(self.itp_bf):
