@@ -278,6 +278,14 @@ call _write
 
 > Note: this may cause problems if your runtime is non-standard, see "Undefined Behavior" below. ⚠️
 
+### `cfg_unroll_loops`
+
+This option is an integer that allows the compiler to unroll loops if the counter is known at compile time.
+Loop unrolling will be disabled if this `cfg_unroll_loops` is negative.
+If the loop can be completely evaluated by the partial evaluator without emitting any instructions, then it will be unrolled if this option is nonnegative.
+Otherwise, the loop will be unrolled if the number of instructions that would be required if the loop were to be unrolled is less than or equal to `cfg_unroll_loops`.
+The loop will be unrolled if the number of iterations is exactly one and `cfg_unroll_loops` is nonnegative.
+
 ## ⚠️❓🤔 Undefined Behavior
 
 The following conditions may cause a Brainfrick program to behave unexpectedly — in compiled mode:

@@ -53,6 +53,10 @@ class BFCompilerX64:
                 self.comp_asm.append(f"movb ${insn.insn_value},{self.comp_mem_ptr}(%rdi)")
             elif insn.insn_type == BF_LAZY_SEEK:
                 self.comp_mem_ptr += insn.insn_value
+            elif insn.insn_type == BF_SPIN:
+                self.comp_asm.append(f"1:rep nop\njmp 1b")
+            elif insn.insn_type == BF_SPIN_NZ:
+                self.comp_asm.append(f"cmpb $0,{self.comp_mem_ptr}(%rdi)\njz 2f\n1:rep nop\njmp 1b\n2:")
             ip += 1
             insn = strm.next()
         return "\n".join(self.comp_asm) + "\nret"

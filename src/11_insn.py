@@ -9,6 +9,8 @@ BF_READ = 5
 BF_WRITE = 6
 BF_SET = 7
 BF_LAZY_SEEK = 8
+BF_SPIN = 9
+BF_SPIN_NZ = 10
 
 BF_TYPES: tuple[str, ...] = (
     "BF_END",
@@ -50,7 +52,7 @@ class BFInsnList(BFInsnStream):
     ils_insns: tuple[BFInsn, ...]
     ils_idx: int
     
-    def __init__(self: typing.Self, insns: list[BFInsn]) -> None:
+    def __init__(self: typing.Self, insns: list[BFInsn] | tuple[BFInsn, ...]) -> None:
         self.ils_insns = tuple(insns)
         self.ils_idx = 0
 
@@ -62,6 +64,16 @@ class BFInsnList(BFInsnStream):
         insn: BFInsn = insns[idx]
         self.ils_idx += 1
         return insn
+
+    def count(self: typing.Self) -> int:
+        size: int = len(self.ils_insns)
+        idx: int = self.ils_idx
+        return size - idx if size > idx else 0
+
+    def peek(self: typing.Self) -> BFInsn:
+        insns: tuple[BFInsn, ...] = self.ils_insns
+        idx: int = self.ils_idx
+        return BFInsn(BF_END, 0) if idx >= len(insns) else insns[idx]
 
     def all(self: typing.Self) -> tuple[BFInsn, ...]:
         insns: tuple[BFInsn, ...] = self.ils_insns
