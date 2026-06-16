@@ -17,7 +17,7 @@ It's not just a Brainfrick interpreter — it's a complete compilation pipeline 
 * Instruction compression and normalization 📦
 * Custom runtime ABI support 🏗️
 
-It's more than "just source-to-assembly translation" — the same intermediate representation can be interpreted directly or compiled into native code. ⚙️
+It's more than "just source-to-assembly translation" — the same intermediate representation can be interpreted directly — or compiled into native code. ⚙️
 
 ## 🧠 Memory Model
 
@@ -69,9 +69,9 @@ Consumes the current cell value and performs output. 🖨️
 
 ### `_start`
 
-This symbol is the entry point of the program — it allocates the Brainfrick memory buffer and sets up the data pointer before calling the Brainfrick entry point `_bf`. 🚀
+This symbol is the entry point of the program — it allocates the Brainfrick memory buffer and sets up the data pointer — before calling the Brainfrick entry point `_bf`. 🚀
 
-The implementation is entirely runtime-defined — terminal I/O, files, sockets, virtual devices, embedded systems, or time travel. ✨
+The implementation is entirely runtime-defined — terminal I/O, files, sockets, virtual devices, embedded systems — or time travel. ✨
 
 ## 🏗️ Custom ABI
 
@@ -83,7 +83,7 @@ The active Brainfrick data pointer is stored in:
 
 Runtime functions must preserve `%rdi` — they are not required to preserve any other registers. 💻
 
-This allows generated code to call runtime helpers without saving and restoring the Brainfrick data pointer around every call. ✨
+This allows generated code to call runtime helpers — without saving and restoring the Brainfrick data pointer around every call. ✨
 
 It's not the System V ABI — it's a deliberately minimal ABI designed around Brainfrick execution. 💯
 
@@ -158,8 +158,9 @@ Optimizations can be toggled individually by changing their respective flag in `
 
 ### `cfg_remove_dead_code`
 
-This option allows the compiler to elide operations that add zero to the current cell or the data pointer, and converts instructions that add or subtract 1 to `inc` and `dec` respectively.
-Only functional if `cfg_fold_repetition` is `True`. Default is `True`. 🗑️
+This option allows the compiler to elide operations that add zero to the current cell or the data pointer — and converts instructions that add or subtract 1 to `inc` and `dec` respectively. 🗑️
+
+Only functional if `cfg_fold_repetition` is `True`. Default is `True`.
 
 For example:
 
@@ -189,8 +190,9 @@ call _write
 
 ### `cfg_fold_repetition`
 
-This option allows the compiler to fold multiple consecutive `+`/`-`, `<`/`>`, `.`, or `,` operations into a single instruction.
-If this option is disabled, always use short instruction encoding for increments and decrements. Default is `True`. 📦
+This option allows the compiler to fold multiple consecutive `+`/`-`, `<`/`>`, `.`, or `,` operations — into a single instruction. 📦
+
+If this option is disabled → always use short instruction encoding for increments and decrements. Default is `True`.
 
 For example:
 
@@ -216,7 +218,7 @@ incb (%rdi)
 
 ### `cfg_lazy_seek`
 
-This option allows the compiler to avoid emitting code that moves the data pointer when it doesn't need to. Default is `True`. ✨
+This option allows the compiler to avoid emitting code that moves the data pointer — when it doesn't need to. Default is `True`. ✨
 
 For example:
 
@@ -244,8 +246,9 @@ call _write
 
 ### `cfg_partial_eval`
 
-This option allows the compiler to precompute constants where `cfg_fold_repetition` would not be able to, and only emit them when they are needed. It assumes the memory buffer starts zeroed out.
-Enabling this option may significantly increase compilation times or code size, especially if `cfg_fold_repetition` or `cfg_remove_dead_code` are disabled. Default is `False`. 💯
+This option allows the compiler to precompute constants where `cfg_fold_repetition` would not be able to — and only emit them when they are needed. It assumes the memory buffer starts zeroed out.
+
+Enabling this option may significantly increase compilation times or code size — especially if `cfg_fold_repetition` or `cfg_remove_dead_code` are disabled. Default is `False`. 💯
 
 For example:
 
@@ -280,11 +283,45 @@ call _write
 
 ### `cfg_unroll_loops`
 
-This option is an integer that allows the compiler to unroll loops if the counter is known at compile time.
-Loop unrolling will be disabled if this `cfg_unroll_loops` is negative.
-If the loop can be completely evaluated by the partial evaluator without emitting any instructions, then it will be unrolled if this option is nonnegative.
-Otherwise, the loop will be unrolled if the number of instructions that would be required if the loop were to be unrolled is less than or equal to `cfg_unroll_loops`.
-The loop will be unrolled if the number of iterations is exactly one and `cfg_unroll_loops` is nonnegative.
+This option is an integer that allows the compiler to unroll loops — if the counter is known at compile time. 🔄
+
+It will only work if `cfg_partial_eval` is enabled. Loop unrolling will be disabled if this `cfg_unroll_loops` is negative.
+
+If the loop can be completely evaluated by the partial evaluator — without emitting any instructions → it will be unrolled if this option is nonnegative.
+
+Otherwise → the loop will be unrolled if the number of instructions that would be required — if the loop were to be unrolled is less than or equal to `cfg_unroll_loops`.
+
+The loop will also be unrolled if the number of iterations is exactly one — and `cfg_unroll_loops` is nonnegative.
+
+For example:
+
+```brainfrick
+++++[->+<].
+```
+
+↓
+
+```asm
+incq %rdi
+movb $4,(%rdi)
+call _write
+```
+
+instead of
+
+```asm
+movb $4,(%rdi)
+cmpb $0,(%rdi)
+jz .LZ0
+.LY0:
+decb (%rdi)
+incb 1(%rdi)
+cmpb $0,(%rdi)
+jnz .LY0
+.LZ0:
+incq %rdi
+call _write
+```
 
 ## ⚠️❓🤔 Undefined Behavior
 
